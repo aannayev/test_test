@@ -19,6 +19,8 @@
   </div>
 </template>
 <script>
+import axios from 'redaxios';
+
 import inputPhone from '@/components/input/phone.vue'
 import inputPassword from '@/components/input/password.vue'
 
@@ -41,21 +43,21 @@ export default {
     }
   },
   methods:{
-    async login(){
-      await this.axios.post("https://dev.moydomonline.ru/api/auth/login/", {
+    login(){
+      axios.post("https://dev.moydomonline.ru/api/auth/login/", {
         username: `7${this.username}`,
         password: this.password
-      }).then(async (response) => {
+      }).then((response) => {
         console.log(response.data)
-        await this.$store.dispatch("updateUser", {
+        this.$store.dispatch("updateUser", {
           ...response.data,
           token: btoa(`7${this.username}` + ':' + this.password)
         })
-        await this.$router.push("/")
-      }).catch(async (error) => {
+        this.$router.push("/")
+      }).catch((error) => {
         if (error) {
           console.log(error)
-          await this.$store.dispatch("updateSnackbar", ["Имя пользователя или пароль неверны", "error"])
+          this.$store.dispatch("updateSnackbar", ["Имя пользователя или пароль неверны", "error"])
         }
       })
     }
@@ -63,6 +65,3 @@ export default {
 }
 
 </script>
-<style scoped>
-
-</style>

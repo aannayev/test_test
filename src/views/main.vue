@@ -15,8 +15,7 @@
         description: null,
         due_date: null,
         status_id: 0
-      }
-      }" type="submit" class="applications-title-btn-add">
+      }}" type="submit" class="applications-title-btn-add">
         СОЗДАТЬ
       </button>
     </div>
@@ -48,7 +47,7 @@
           :items="items? items.results : []"
       >
         <template v-slot:default="{ items }">
-          <tr v-for="item in items">
+          <tr v-for="item in items" :key="item.number">
             <td><div @click="editApplication(item)" class="number-btn">{{ item?.number }}</div></td>
             <td>{{ dateToString(item?.created_at) }}</td>
             <td>{{ item?.premise?.address }}</td>
@@ -145,6 +144,8 @@
   </div>
 </template>
 <script>
+import axios from 'redaxios';
+
 import InputText from "@/components/input/text.vue";
 import InputTextarea from "@/components/input/textarea.vue";
 import InputSelect from "@/components/input/select.vue";
@@ -196,7 +197,7 @@ export default {
   methods: {
     async fetchApplications() {
       this.loading=true
-      await this.axios.get("https://dev.moydomonline.ru/api/appeals/v1.0/appeals/", {
+      await axios.get("https://dev.moydomonline.ru/api/appeals/v1.0/appeals/", {
         params:{
           search: this.search,
           premise_id: this.premise_id,
@@ -207,7 +208,7 @@ export default {
           Authorization: `Basic ${this.$store.getters.getUser.token}`
         }
       }).then(async (response) => {
-        if (response.data.hasOwnProperty('results')) {
+        if (Object.prototype.hasOwnProperty.call(response.data, 'results')) {
           this.items=response.data
         }
       }).catch(async (error) => {
@@ -218,7 +219,7 @@ export default {
       this.loading=false
     },
     async fetchUserPremises() {
-      await this.axios.get("https://dev.moydomonline.ru/api/geo/v2.0/user-premises/", {
+      await axios.get("https://dev.moydomonline.ru/api/geo/v2.0/user-premises/", {
         headers: {
           Authorization: `Basic ${this.$store.getters.getUser.token}`
         }
@@ -231,7 +232,7 @@ export default {
       })
     },
     async fetchUserPremisesApartments() {
-      await this.axios.get("https://dev.moydomonline.ru/api/geo/v1.0/apartments/?page_size=99999", {
+      await axios.get("https://dev.moydomonline.ru/api/geo/v1.0/apartments/?page_size=99999", {
         headers: {
           Authorization: `Basic ${this.$store.getters.getUser.token}`
         },
@@ -249,16 +250,16 @@ export default {
     async createApplication() {
       this.applicationPayload.due_date=this.dateFormat(this.applicationPayload.due_date)+" 00:00"
 
-      await this.axios.post("https://dev.moydomonline.ru/api/appeals/v1.0/appeals/", {
+      await axios.post("https://dev.moydomonline.ru/api/appeals/v1.0/appeals/", {
         ...this.applicationPayload
       },{
         headers: {
           Authorization: `Basic ${this.$store.getters.getUser.token}`
         },
-      }).then(async (response) => {
+      }).then(async () => {
         this.modalState=false
 
-        if (this.applicationPayload.hasOwnProperty('number')) {
+        if (Object.prototype.hasOwnProperty.call(this.applicationPayload, 'number')) {
           await this.$store.dispatch("updateSnackbar", ["Заявка изменена", "success"])
         }else {
           await this.$store.dispatch("updateSnackbar", ["Заявка создана", "success"])

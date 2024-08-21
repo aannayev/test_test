@@ -1,14 +1,10 @@
 import Vue from 'vue'
 import store from './store'
-import axios from 'axios'
-import VueAxios from 'vue-axios'
-
-import App from './App.vue'
 import router from './router'
 
-import './assets/style.scss'
+import App from './App.vue'
 
-Vue.use(VueAxios, axios)
+import './assets/style.scss'
 
 import { ValidationProvider, ValidationObserver, extend } from 'vee-validate';
 import { required } from 'vee-validate/dist/rules';
